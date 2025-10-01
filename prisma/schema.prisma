@@ -7,18 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Project {
-  id          String        @id @default(cuid())
-  name        String
-  status      ProjectStatus @default(PLANNED)
-  description String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+// --- Models ---
+
+// 病患
+model Patient {
+  id        String   @id @default(cuid()) @map("病患ID")
+  name      String   @map("姓名")
+  gender    Gender   @map("性別")
+  age       Int      @map("年齡")
+  createdAt DateTime @default(now()) @map("建立時間")
+  updatedAt DateTime @updatedAt @map("上次更新時間")
+
+  exercises LiftLegExercise[] @relation("PatientToExercise")
+
+  @@map("病患") // table name
 }
 
-enum ProjectStatus {
-  PLANNED
-  ACTIVE
-  COMPLETE
-  ARCHIVED
+model LiftLegExercise {
+  id             String   @id @default(cuid()) @map("ID")
+  patientId      String   @map("病患ID")
+  correctCount   Int      @map("正確次數")
+  incorrectCount Int      @map("錯誤次數")
+  createdAt      DateTime @default(now()) @map("建立時間")
+  updatedAt      DateTime @updatedAt @map("上次更新時間")
+
+  patient Patient @relation(fields: [patientId], references: [id], name: "PatientToExercise")
+}
+
+enum Gender {
+  MALE
+  FEMALE
 }
