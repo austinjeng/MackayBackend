@@ -20,14 +20,14 @@ export default async function HomePage() {
   return (
     <div className="home">
       <header className="hero">
-        <span className="eyebrow">Mackay Backend</span>
-        <h1>Patient Dashboard</h1>
-        <p>A list of patients in the system.</p>
+        <span className="eyebrow">馬偕復健後端</span>
+        <h1>復健患者運動資料主控台</h1>
+        <p>病患列表</p>
       </header>
 
       <section className="panel" aria-label="Patients">
         <div className="panel-header">
-          <h2>Patients</h2>
+          <h2>病患列表</h2>
           <span>{patients.length} shown</span>
         </div>
 

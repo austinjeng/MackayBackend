@@ -32,6 +32,8 @@ model LiftLegExercise {
   updatedAt      DateTime @updatedAt @map("上次更新時間")
 
   patient Patient @relation(fields: [patientId], references: [id], name: "PatientToExercise")
+
+  @@map("膝抬高-側面")
 }
 
 enum Gender {
