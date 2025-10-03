@@ -1,5 +1,6 @@
 import { Patient } from '@prisma/client';
 import prisma from "@/lib/prisma";
+import Link from 'next/link';
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -40,10 +41,12 @@ export default async function HomePage() {
           <ul className="project-list">  {/* Using existing class for some styling */}
             {patients.map((patient) => (
               <li key={patient.id} className="project-list-item"> {/* Using existing class for some styling */}
-                <div>
-                  <h3>{patient.name}</h3>
-                  <span>Age: {patient.age}, Gender: {patient.gender}</span>
-                </div>
+                <Link href={`/patients/${patient.id}/exercises`} className="project-link">
+                  <div>
+                    <h3>{patient.name}</h3>
+                    <span>Age: {patient.age}, Gender: {patient.gender}</span>
+                  </div>
+                </Link>
               </li>
             ))}
           </ul>
