@@ -37,6 +37,6 @@ model LiftLegExercise {
 }
 
 enum Gender {
-  MALE
-  FEMALE
+  MALE   @map("男性")
+  FEMALE @map("女性")
 }

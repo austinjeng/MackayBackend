@@ -44,7 +44,7 @@ export default async function HomePage() {
                 <Link href={`/patients/${patient.id}/exercises`} className="project-link">
                   <div>
                     <h3>{patient.name}</h3>
-                    <span>Age: {patient.age}, Gender: {patient.gender}</span>
+                    <span>年齡: {patient.age}, 性別: {patient.gender}</span>
                   </div>
                 </Link>
               </li>
