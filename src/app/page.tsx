@@ -34,8 +34,8 @@ export default async function HomePage() {
 
         {patients.length === 0 ? (
           <div className="empty-state">
-            <h3>No patients found</h3>
-            <p>You can seed the database to add some patients.</p>
+            <h3>沒有病患</h3>
+            <p>請檢查資料庫連線</p>
           </div>
         ) : (
           <ul className="project-list">  {/* Using existing class for some styling */}
