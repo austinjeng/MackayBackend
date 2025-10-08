@@ -11,7 +11,7 @@ datasource db {
 
 // 病患
 model Patient {
-  id        String   @id @default(cuid()) @map("病患ID")
+  id        String   @id @map("病患ID")
   name      String   @map("姓名")
   gender    Gender   @map("性別")
   age       Int      @map("年齡")
