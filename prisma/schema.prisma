@@ -13,30 +13,71 @@ datasource db {
 model Patient {
   id        String   @id @map("病患ID")
   name      String   @map("姓名")
-  gender    Gender   @map("性別")
-  age       Int      @map("年齡")
+  dob       DateTime @db.Date @map("出生日期")
   createdAt DateTime @default(now()) @map("建立時間")
   updatedAt DateTime @updatedAt @map("上次更新時間")
 
-  exercises LiftLegExercise[] @relation("PatientToExercise")
+  sessions Session[]
 
   @@map("病患") // table name
 }
 
-model LiftLegExercise {
-  id             String   @id @default(cuid()) @map("ID")
-  patientId      String   @map("病患ID")
-  correctCount   Int      @map("正確次數")
-  incorrectCount Int      @map("錯誤次數")
-  createdAt      DateTime @default(now()) @map("建立時間")
-  updatedAt      DateTime @updatedAt @map("上次更新時間")
+// 運動類型
+model ExerciseType {
+  id        Int      @id @default(autoincrement()) @map("運動類型ID") @db.SmallInt
+  code      String   @unique @map("代碼")
+  name      String   @map("名稱")
+  createdAt DateTime @default(now()) @map("建立時間")
+  updatedAt DateTime @updatedAt @map("上次更新時間")
 
-  patient Patient @relation(fields: [patientId], references: [id], name: "PatientToExercise")
+  sessionExercises SessionExercise[]
 
-  @@map("膝抬高-側面")
+  @@map("運動類型")
 }
 
-enum Gender {
-  MALE   @map("男性")
-  FEMALE @map("女性")
+// 運動會話
+model Session {
+  id        Int      @id @default(autoincrement()) @map("會話ID")
+  patientId String   @map("病患ID")
+  startedAt DateTime @map("開始時間")
+  endedAt   DateTime? @map("結束時間")
+  status    SessionStatus @default(open) @map("狀態")
+  createdAt DateTime @default(now()) @map("建立時間")
+  updatedAt DateTime @updatedAt @map("上次更新時間")
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  sessionExercises SessionExercise[]
+
+  @@index([patientId, startedAt(sort: Desc)])
+  @@map("運動會話")
+}
+
+// 會話運動
+model SessionExercise {
+  id               Int                   @id @default(autoincrement()) @map("會話運動ID")
+  sessionId        Int                   @map("會話ID")
+  exerciseTypeId   Int                   @map("運動類型ID")
+  status           SessionExerciseStatus @default(open) @map("狀態")
+  startedAt        DateTime?             @map("開始時間")
+  endedAt          DateTime?             @map("結束時間")
+  createdAt        DateTime              @default(now()) @map("建立時間")
+  updatedAt        DateTime              @updatedAt @map("上次更新時間")
+
+  session      Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  exerciseType ExerciseType @relation(fields: [exerciseTypeId], references: [id], onDelete: Restrict)
+
+  @@index([sessionId])
+  @@map("會話運動")
+}
+
+enum SessionStatus {
+  open    @map("開啟")
+  closed  @map("關閉")
+  aborted @map("中止")
+}
+
+enum SessionExerciseStatus {
+  open    @map("開啟")
+  closed  @map("關閉")
+  aborted @map("中止")
 }
