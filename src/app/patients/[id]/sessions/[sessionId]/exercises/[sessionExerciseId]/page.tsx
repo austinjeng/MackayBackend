@@ -46,14 +46,14 @@ export default async function SessionExerciseDetailPage({ params }: ExerciseDeta
     <div className="home">
       <header className="hero">
         <span className="eyebrow">{exerciseType.name}</span>
-        <h1>Exercise Details</h1>
-        <p>Patient: {sessionExercise.session.patient.name}</p>
+        <h1>運動詳細資料</h1>
+        <p>病患名稱: {sessionExercise.session.patient.name}</p>
       </header>
 
       <section className="panel" aria-label="Exercise Attempts">
         <div className="panel-header">
-          <h2>All Attempts</h2>
-          <span>{attempts.length} attempts found</span>
+          <h2>所有嘗試</h2>
+          <span>{attempts.length} 嘗試 found</span>
         </div>
 
         {attempts.length === 0 ? (
@@ -65,11 +65,11 @@ export default async function SessionExerciseDetailPage({ params }: ExerciseDeta
             {attempts.map((attempt) => (
               <li key={attempt.id} className="project-list-item">
                 <div>
-                  <h3>Outcome: {attempt.outcome}</h3>
-                  <span>Angle: {attempt.angleDeg.toString()}°</span>
+                  <h3>結果: {attempt.outcome}</h3>
+                  <span>角度: {attempt.angleDeg.toString()}°</span>
                   <br />
                   <span>
-                    Time: {new Date(attempt.createdAt).toLocaleTimeString('zh-TW', {
+                    建立時間: {new Date(attempt.createdAt).toLocaleTimeString('zh-TW', {
                       timeZone: 'Asia/Taipei',
                     })}
                   </span>

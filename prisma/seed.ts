@@ -17,7 +17,7 @@ async function main() {
   const alternatingKnees = await prisma.exerciseType.create({
     data: {
       code: 'ALTERNATING_KNEES',
-      name: '交替抬膝',
+      name: '雙膝交互​抬​高(側)',
     },
   });
   console.log(`Created exercise type: ${alternatingKnees.name}`);

@@ -38,9 +38,9 @@ export default async function SessionDetailPage({ params }: SessionDetailPagePro
     <div className="home">
       <header className="hero">
         <span className="eyebrow">Patient: {session.patient.name}</span>
-        <h1>Session ID: {session.id}</h1>
+        <h1>復健ID: {session.id}</h1>
         <p>
-          Recorded on: {new Date(session.createdAt).toLocaleString('zh-TW', {
+          建立時間: {new Date(session.createdAt).toLocaleString('zh-TW', {
             timeZone: 'Asia/Taipei',
             dateStyle: 'full',
             timeStyle: 'short',
@@ -50,13 +50,13 @@ export default async function SessionDetailPage({ params }: SessionDetailPagePro
 
       <section className="panel" aria-label="Session Exercises">
         <div className="panel-header">
-          <h2>Exercises in this Session</h2>
-          <span>{session.sessionExercises.length} exercises found</span>
+          <h2>復健中的運動</h2>
+          <span>{session.sessionExercises.length} 運動 found</span>
         </div>
 
         {session.sessionExercises.length === 0 ? (
           <div className="empty-state">
-            <h3>No exercises were recorded in this session.</h3>
+            <h3>沒有找到復健</h3>
           </div>
         ) : (
           <ul className="project-list">
@@ -66,7 +66,7 @@ export default async function SessionDetailPage({ params }: SessionDetailPagePro
                   <div>
                     <h3>{sessionExercise.exerciseType.name}</h3>
                     {/* You can add more details about the session exercise here if needed */}
-                    <span>Status: {sessionExercise.status}</span>
+                    <span>狀態: {sessionExercise.status}</span>
                   </div>
                 </Link>
               </li>

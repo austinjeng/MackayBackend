@@ -23,19 +23,19 @@ export default async function PatientSessionsListPage({ params }: { params: { id
       <header className="hero">
         <span className="eyebrow">Patient</span>
         <h1>{patient.name}</h1>
-        <p>Session History</p>
+        <p>復健歷史</p>
       </header>
 
       <section className="panel" aria-label="Sessions">
         <div className="panel-header">
-          <h2>All Sessions</h2>
-          <span>{patient.sessions.length} sessions found</span>
+          <h2>所有復健</h2>
+          <span>{patient.sessions.length} 復健 found</span>
         </div>
 
         {patient.sessions.length === 0 ? (
           <div className="empty-state">
-            <h3>No sessions recorded</h3>
-            <p>This patient does not have any exercise session history yet.</p>
+            <h3>沒有復健</h3>
+            <p>這個病患還沒有任何復健</p>
           </div>
         ) : (
           <ul className="project-list">
@@ -43,9 +43,9 @@ export default async function PatientSessionsListPage({ params }: { params: { id
               <li key={session.id} className="project-list-item">
                 <Link href={`/patients/${patient.id}/sessions/${session.id}`} className="project-link" style={{ width: '100%' }}>
                   <div>
-                    <h3>Session ID: {session.id}</h3>
+                    <h3>復健ID: {session.id}</h3>
                     <span>
-                      Recorded on: {new Date(session.createdAt).toLocaleString('zh-TW', {
+                      建立時間: {new Date(session.createdAt).toLocaleString('zh-TW', {
                         timeZone: 'Asia/Taipei',
                         year: 'numeric',
                         month: 'long',
