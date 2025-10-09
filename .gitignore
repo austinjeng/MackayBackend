@@ -22,3 +22,6 @@ prisma/*.db
 
 # 
 image_for_gemini
+
+# docker
+/.docker

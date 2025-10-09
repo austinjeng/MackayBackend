@@ -15,6 +15,24 @@ async function loadPatientData(): Promise<Patient[]> {
   }
 }
 
+function calculateAge(dob: Date | null): number | null {
+  if (!dob) return null;
+
+  const birthDate = new Date(dob);
+  if (Number.isNaN(birthDate.getTime())) return null;
+
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  const isBirthdayMonthPassed = monthDiff > 0 || (monthDiff === 0 && today.getDate() >= birthDate.getDate());
+
+  if (!isBirthdayMonthPassed) {
+    age -= 1;
+  }
+
+  return age;
+}
+
 export default async function HomePage() {
   const patients = await loadPatientData();
 
@@ -31,7 +49,6 @@ export default async function HomePage() {
           <h2>病患列表</h2>
           <span>{patients.length} shown</span>
         </div>
-
         {patients.length === 0 ? (
           <div className="empty-state">
             <h3>沒有病患</h3>
@@ -39,16 +56,20 @@ export default async function HomePage() {
           </div>
         ) : (
           <ul className="project-list">  {/* Using existing class for some styling */}
-            {patients.map((patient) => (
-              <li key={patient.id} className="project-list-item"> {/* Using existing class for some styling */}
-                <Link href={`/patients/${patient.id}/exercises`} className="project-link">
-                  <div>
-                    <h3>{patient.name}</h3>
-                    <span>年齡: {patient.age}, 性別: {patient.gender}</span>
-                  </div>
-                </Link>
-              </li>
-            ))}
+            {patients.map((patient) => {
+              const age = calculateAge(patient.dob);
+
+              return (
+                <li key={patient.id} className="project-list-item"> {/* Using existing class for some styling */}
+                  <Link href={`/patients/${patient.id}/sessions`} className="project-link">
+                    <div>
+                      <h3>{patient.name}</h3>
+                      <span>年齡: {age !== null ? `${age} 歲` : '未知'}</span>
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
