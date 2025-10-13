@@ -63,13 +63,9 @@ model SessionExercise {
   createdAt      DateTime              @default(now()) @map("建立時間")
   updatedAt      DateTime              @updatedAt @map("上次更新時間")
 
-  session                         Session                           @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  exerciseType                    ExerciseType                      @relation(fields: [exerciseTypeId], references: [id], onDelete: Restrict)
-  ExerciseAlternatingKneesAttempt ExerciseAlternatingKneesAttempt[]
-  ExerciseHeelToToeWalkAttempt ExerciseHeelToToeWalkAttempt[]
-  ExerciseSideStepsAttempt ExerciseSideStepsAttempt[]
-  ExerciseSquatAttempt ExerciseSquatAttempt[]
-  ExerciseTiptoeStandAttempt ExerciseTiptoeStandAttempt[]
+  session      Session         @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  exerciseType ExerciseType    @relation(fields: [exerciseTypeId], references: [id], onDelete: Restrict)
+  attempts     ExerciseAttempt[]
 
   @@index([sessionId])
   @@map("會話運動")
@@ -93,14 +89,14 @@ enum AttemptOutcome {
   invalid @map("無效")
 }
 
-// 雙膝交互​抬​高(側)紀錄
-model ExerciseAlternatingKneesAttempt {
+// 通用運動紀錄
+model ExerciseAttempt {
   id                Int            @id @default(autoincrement()) @map("紀錄ID")
   sessionExerciseId Int            @map("會話運動ID")
   startedAt         DateTime       @map("開始時間")
   endedAt           DateTime?      @map("結束時間")
   outcome           AttemptOutcome @map("結果")
-  angleDeg          Decimal        @map("角度") @db.Decimal(6, 3)
+  data              Json?          @map("數據")
   createdAt         DateTime       @default(now()) @map("建立時間")
   updatedAt         DateTime       @updatedAt @map("上次更新時間")
 
@@ -108,78 +104,5 @@ model ExerciseAlternatingKneesAttempt {
 
   @@index([sessionExerciseId, startedAt(sort: Desc)])
   @@index([outcome])
-  @@map("雙膝交互​抬​高(側)")
-}
-
-// 腳尖​對腳​跟紀錄
-model ExerciseHeelToToeWalkAttempt {
-  id                Int            @id @default(autoincrement()) @map("紀錄ID")
-  sessionExerciseId Int            @map("會話運動ID")
-  startedAt         DateTime       @map("開始時間")
-  endedAt           DateTime?      @map("結束時間")
-  outcome           AttemptOutcome @map("結果")
-  createdAt         DateTime       @default(now()) @map("建立時間")
-  updatedAt         DateTime       @updatedAt @map("上次更新時間")
-
-  sessionExercise SessionExercise @relation(fields: [sessionExerciseId], references: [id], onDelete: Cascade)
-
-  @@index([sessionExerciseId, startedAt(sort: Desc)])
-  @@index([outcome])
-  @@map("腳尖​對腳​跟​")
-}
-
-
-// 左右跨步紀錄
-model ExerciseSideStepsAttempt {
-  id                Int            @id @default(autoincrement()) @map("紀錄ID")
-  sessionExerciseId Int            @map("會話運動ID")
-  startedAt         DateTime       @map("開始時間")
-  endedAt           DateTime?      @map("結束時間")
-  outcome           AttemptOutcome @map("結果")
-  angleDeg          Decimal        @map("角度") @db.Decimal(6, 3)
-  createdAt         DateTime       @default(now()) @map("建立時間")
-  updatedAt         DateTime       @updatedAt @map("上次更新時間")
-
-  sessionExercise SessionExercise @relation(fields: [sessionExerciseId], references: [id], onDelete: Cascade)
-
-  @@index([sessionExerciseId, startedAt(sort: Desc)])
-  @@index([outcome])
-  @@map("左右跨步​")
-}
-
-// 深蹲紀錄
-model ExerciseSquatAttempt {
-  id                Int            @id @default(autoincrement()) @map("紀錄ID")
-  sessionExerciseId Int            @map("會話運動ID")
-  startedAt         DateTime       @map("開始時間")
-  endedAt           DateTime?      @map("結束時間")
-  outcome           AttemptOutcome @map("結果")
-  angleDeg          Decimal        @map("角度") @db.Decimal(6, 3)
-  createdAt         DateTime       @default(now()) @map("建立時間")
-  updatedAt         DateTime       @updatedAt @map("上次更新時間")
-
-  sessionExercise SessionExercise @relation(fields: [sessionExerciseId], references: [id], onDelete: Cascade)
-
-  @@index([sessionExerciseId, startedAt(sort: Desc)])
-  @@index([outcome])
-  @@map("深蹲​")
-}
-
-//墊腳尖站​立紀錄
-model ExerciseTiptoeStandAttempt {
-  id                Int            @id @default(autoincrement()) @map("紀錄ID")
-  sessionExerciseId Int            @map("會話運動ID")
-  startedAt         DateTime       @map("開始時間")
-  endedAt           DateTime?      @map("結束時間")
-  outcome           AttemptOutcome @map("結果")
-  angleDeg          Decimal        @map("角度") @db.Decimal(6, 3)
-  holdSeconds       Decimal        @map("維持秒數") @db.Decimal(6, 3)
-  createdAt         DateTime       @default(now()) @map("建立時間")
-  updatedAt         DateTime       @updatedAt @map("上次更新時間")
-
-  sessionExercise SessionExercise @relation(fields: [sessionExerciseId], references: [id], onDelete: Cascade)
-
-  @@index([sessionExerciseId, startedAt(sort: Desc)])
-  @@index([outcome])
-  @@map("墊腳尖站​立​")
+  @@map("運動紀錄")
 }
