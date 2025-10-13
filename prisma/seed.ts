@@ -127,14 +127,6 @@ async function main() {
       { sessionExerciseId: sessionExercises[3].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg: random(108, 135) } },
     ],
   });
-  await prisma.exerciseAttempt.create({
-    data: {
-      sessionExerciseId: sessionExercises[3].id,
-      startedAt: timeNow(),
-      outcome: 'invalid',
-      data: { reason: 'Sensor offline' }, // No endedAt because it was invalid
-    },
-  });
 
   // Attempts for Tiptoe Stand
   await prisma.exerciseAttempt.createMany({

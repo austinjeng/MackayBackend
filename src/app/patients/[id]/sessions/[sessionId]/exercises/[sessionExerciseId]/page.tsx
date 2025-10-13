@@ -1,6 +1,35 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 
+// Helper component to add some basic styling for the table
+const TableStyles = () => (
+  <style>{`
+    .dynamic-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9em;
+    }
+    .dynamic-table th, .dynamic-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    .dynamic-table thead th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+    .dynamic-table tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    .dynamic-table tbody tr:hover {
+      background-color: #f1f1f1;
+    }
+    .outcome-success { color: #28a745; }
+    .outcome-fail { color: #dc3545; }
+    .outcome-invalid { color: #6c757d; }
+  `}</style>
+);
+
 interface ExerciseDetailPageProps {
   params: {
     id: string; // patientId
@@ -13,70 +42,94 @@ export default async function SessionExerciseDetailPage({ params }: ExerciseDeta
   const { id: patientId, sessionId, sessionExerciseId } = params;
 
   const sessionExercise = await prisma.sessionExercise.findUnique({
-    where: {
-      id: parseInt(sessionExerciseId),
-    },
+    where: { id: parseInt(sessionExerciseId) },
     include: {
-      session: {
-        include: {
-          patient: true,
-        },
-      },
+      session: { include: { patient: true } },
       exerciseType: true,
-      ExerciseAlternatingKneesAttempt: {
-        orderBy: {
-          createdAt: 'desc',
-        },
-      },
+      attempts: { orderBy: { startedAt: 'asc' } },
     },
   });
 
-  // Security checks
-  if (
-    !sessionExercise ||
-    sessionExercise.session.id !== parseInt(sessionId) ||
-    sessionExercise.session.patient.id !== patientId
-  ) {
+  if (!sessionExercise || sessionExercise.session.id !== parseInt(sessionId) || sessionExercise.session.patient.id !== patientId) {
     notFound();
   }
 
-  const { exerciseType, ExerciseAlternatingKneesAttempt: attempts } = sessionExercise;
+  const { exerciseType, attempts } = sessionExercise;
+
+  // Mappings for localization
+  const headerLocalizationMap: { [key: string]: string } = {
+    angleDeg: '角度',
+    holdSeconds: '維持秒數',
+    steps: '步數',
+    deviations: '偏移次數',
+    reason: '原因',
+  };
+
+  const outcomeLocalizationMap: { [key: string]: string } = {
+    success: '成功',
+    fail: '失敗',
+    invalid: '無效',
+  };
+
+
+  // Logic to determine dynamic columns from the JSON data
+  const allDataKeys = new Set<string>();
+  attempts.forEach(attempt => {
+    if (attempt.data && typeof attempt.data === 'object' && !Array.isArray(attempt.data)) {
+      Object.keys(attempt.data).forEach(key => allDataKeys.add(key));
+    }
+  });
+  const dynamicHeaders = Array.from(allDataKeys);
 
   return (
     <div className="home">
+      <TableStyles />
       <header className="hero">
-        <span className="eyebrow">{exerciseType.name}</span>
-        <h1>運動詳細資料</h1>
+        <span className="eyebrow">運動詳細資料</span>
+        <h1>{exerciseType.name}</h1>
         <p>病患名稱: {sessionExercise.session.patient.name}</p>
       </header>
 
       <section className="panel" aria-label="Exercise Attempts">
         <div className="panel-header">
           <h2>所有嘗試</h2>
-          <span>{attempts.length} 嘗試 found</span>
+          <span>找到 {attempts.length} 筆嘗試資料</span>
         </div>
 
         {attempts.length === 0 ? (
           <div className="empty-state">
-            <h3>No attempts were recorded for this exercise.</h3>
+            <h3>這個運動沒有任何嘗試紀錄</h3>
           </div>
         ) : (
-          <ul className="project-list">
-            {attempts.map((attempt) => (
-              <li key={attempt.id} className="project-list-item">
-                <div>
-                  <h3>結果: {attempt.outcome}</h3>
-                  <span>角度: {attempt.angleDeg.toString()}°</span>
-                  <br />
-                  <span>
-                    建立時間: {new Date(attempt.createdAt).toLocaleTimeString('zh-TW', {
-                      timeZone: 'Asia/Taipei',
-                    })}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="dynamic-table">
+              <thead>
+                <tr>
+                  <th>嘗試ID</th>
+                  <th>結果</th>
+                  <th>紀錄時間</th>
+                  {/* Dynamic headers from JSON data */}
+                  {dynamicHeaders.map(header => <th key={header}>{headerLocalizationMap[header] || header}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {attempts.map(attempt => {
+                  return (
+                    <tr key={attempt.id}>
+                      <td>{attempt.id}</td>
+                      <td className={`outcome-${attempt.outcome}`}>{outcomeLocalizationMap[attempt.outcome] || attempt.outcome}</td>
+                      <td>{new Date(attempt.startedAt).toLocaleTimeString('zh-TW')}</td>
+                      {/* Dynamic cells for JSON data */}
+                      {dynamicHeaders.map(header => {
+                        const value = (attempt.data as any)?.[header];
+                        return <td key={header}>{value !== undefined ? String(value) : '−'}</td>;
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
     </div>

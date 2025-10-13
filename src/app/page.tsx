@@ -47,7 +47,7 @@ export default async function HomePage() {
       <section className="panel" aria-label="Patients">
         <div className="panel-header">
           <h2>病患列表</h2>
-          <span>{patients.length} shown</span>
+          <span>找到 {patients.length} 筆資料 </span>
         </div>
         {patients.length === 0 ? (
           <div className="empty-state">

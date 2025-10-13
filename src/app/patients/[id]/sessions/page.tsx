@@ -21,7 +21,7 @@ export default async function PatientSessionsListPage({ params }: { params: { id
   return (
     <div className="home">
       <header className="hero">
-        <span className="eyebrow">Patient</span>
+        <span className="eyebrow">病患</span>
         <h1>{patient.name}</h1>
         <p>復健歷史</p>
       </header>
@@ -29,13 +29,13 @@ export default async function PatientSessionsListPage({ params }: { params: { id
       <section className="panel" aria-label="Sessions">
         <div className="panel-header">
           <h2>所有復健</h2>
-          <span>{patient.sessions.length} 復健 found</span>
+          <span>找到 {patient.sessions.length} 筆復健資料</span>
         </div>
 
         {patient.sessions.length === 0 ? (
           <div className="empty-state">
-            <h3>沒有復健</h3>
-            <p>這個病患還沒有任何復健</p>
+            <h3>沒有復健資料</h3>
+            <p>這個病患還沒有進行任何復健</p>
           </div>
         ) : (
           <ul className="project-list">
