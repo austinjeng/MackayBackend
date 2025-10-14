@@ -94,6 +94,14 @@ async function main() {
       { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg: random(70, 110) } },
       { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
       { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(55, 69) } },
+      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
+      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(55, 69) } },
+      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
+      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(55, 69) } },
+      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
+      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
+      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
+      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(55, 69) } },
     ],
   });
 

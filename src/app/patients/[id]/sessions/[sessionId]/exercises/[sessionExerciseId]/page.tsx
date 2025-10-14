@@ -24,9 +24,34 @@ const TableStyles = () => (
     .dynamic-table tbody tr:hover {
       background-color: #f1f1f1;
     }
-    .outcome-success { color: #28a745; }
-    .outcome-fail { color: #dc3545; }
-    .outcome-invalid { color: #6c757d; }
+    td.outcome-success, .stat-card p.outcome-success { color: #28a745; }
+    td.outcome-fail, .stat-card p.outcome-fail { color: #dc3545; }
+    td.outcome-invalid { color: #6c757d; }
+    .stats-container {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .stat-card {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px;
+      flex-grow: 1;
+      text-align: center;
+    }
+    .stat-card h4 {
+      margin: 0 0 8px 0;
+      font-size: 1em;
+      color: #555;
+    }
+    .stat-card p {
+      margin: 0;
+      font-size: 2em;
+      font-weight: bold;
+      color: #333;
+    }
   `}</style>
 );
 
@@ -81,6 +106,17 @@ export default async function SessionExerciseDetailPage({ params }: ExerciseDeta
   });
   const dynamicHeaders = Array.from(allDataKeys);
 
+  // Calculate statistics
+  const stats = attempts.reduce((acc, attempt) => {
+    if (attempt.outcome === 'success') acc.success++;
+    if (attempt.outcome === 'fail') acc.fail++;
+    return acc;
+  }, { success: 0, fail: 0 });
+
+  const totalValidAttempts = stats.success + stats.fail;
+  const successRate = totalValidAttempts > 0 ? (stats.success / totalValidAttempts) * 100 : 0;
+
+
   return (
     <div className="home">
       <TableStyles />
@@ -96,6 +132,22 @@ export default async function SessionExerciseDetailPage({ params }: ExerciseDeta
           <span>找到 {attempts.length} 筆嘗試資料</span>
         </div>
 
+        <div className="stats-container">
+          <div className="stat-card">
+            <h4>成功次數</h4>
+            <p className="outcome-success">{stats.success}</p>
+          </div>
+          <div className="stat-card">
+            <h4>失敗次數</h4>
+            <p className="outcome-fail">{stats.fail}</p>
+          </div>
+          <div className="stat-card">
+            <h4>成功率</h4>
+            <p>{successRate.toFixed(1)}%</p>
+          </div>
+        </div>
+
+
         {attempts.length === 0 ? (
           <div className="empty-state">
             <h3>這個運動沒有任何嘗試紀錄</h3>
@@ -105,7 +157,7 @@ export default async function SessionExerciseDetailPage({ params }: ExerciseDeta
             <table className="dynamic-table">
               <thead>
                 <tr>
-                  <th>嘗試ID</th>
+                  <th>ID</th>
                   <th>結果</th>
                   <th>紀錄時間</th>
                   {/* Dynamic headers from JSON data */}
