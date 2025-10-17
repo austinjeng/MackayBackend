@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import { authenticateApiRequest } from '@/lib/apiAuth';
 
 interface AttemptsApiRouteProps {
   params: {
@@ -11,7 +12,7 @@ interface AttemptsApiRouteProps {
 
 // The request body will be an array of attempt objects
 interface AttemptPayload {
-  startedAt: string; // ISO 8601 date string
+  startedAt: string; // ISO 8601 date string｀
   endedAt?: string; // ISO 8601 date string
   outcome: 'success' | 'fail' | 'invalid';
   data?: Prisma.InputJsonValue;
@@ -19,6 +20,28 @@ interface AttemptPayload {
 
 export async function POST(request: Request, { params }: AttemptsApiRouteProps) {
   const { sessionExerciseId } = params;
+  const authResult = await authenticateApiRequest(request);
+
+  if ('response' in authResult) {
+    return authResult.response;
+  }
+
+  const { patientId } = authResult;
+
+  // Authorization Check: Ensure the session exercise belongs to the authenticated patient
+  try {
+    const sessionExercise = await prisma.sessionExercise.findUnique({
+      where: { id: parseInt(sessionExerciseId) },
+      select: { session: { select: { patientId: true } } },
+    });
+
+    if (!sessionExercise || sessionExercise.session.patientId !== patientId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  } catch (e) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
 
   try {
     const body: { attempts: AttemptPayload[] } = await request.json();

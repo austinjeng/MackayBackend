@@ -64,6 +64,16 @@ async function main() {
 
   console.log(`Created patient: ${patient.name}`);
 
+  // Log the API key for the test patient
+  const createdPatient = await prisma.patient.findUnique({ where: { id: patient.id } });
+  if (createdPatient) {
+    console.log(`
+!!! IMPORTANT !!!`);
+    console.log(`API Key for ${patient.name}: ${createdPatient.apiKey}`);
+    console.log(`Use this key in the 'X-API-Key' header for testing.
+`);
+  }
+
   // 4. Create a Session
   const session = await prisma.session.create({
     data: {

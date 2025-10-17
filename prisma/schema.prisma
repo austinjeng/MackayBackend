@@ -12,6 +12,7 @@ datasource db {
 // 病患
 model Patient {
   id        String   @id @map("病患ID")
+  apiKey    String   @unique @default(cuid()) @map("API金鑰")
   name      String   @map("姓名")
   dob       DateTime @map("出生日期") @db.Date
   createdAt DateTime @default(now()) @map("建立時間")
