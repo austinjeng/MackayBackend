@@ -5,7 +5,8 @@ export default withAuth(
   function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
-    // For API routes that are not auth-related, perform API key check
+
+    // 針對 API 路由的 API Key 檢查
     if (pathname.startsWith('/api/') && !pathname.startsWith('/api/auth')) {
       const apiKey = req.headers.get('x-api-key') ?? req.headers.get('X-API-Key');
       if (!apiKey) {
@@ -14,8 +15,6 @@ export default withAuth(
           { status: 401, headers: { 'Content-Type': 'application/json' } }
         );
       }
-      // Here you could add logic to validate the API key against the database
-      // For now, we just check for its presence.
     }
 
     // If the request is for a web page and the user is authenticated (which withAuth checks),
@@ -45,8 +44,8 @@ export default withAuth(
   }
 );
 
+//沒被列在 `matcher` 裡的，就是公開的
 export const config = {
-  // The matcher protects all patient data pages and the relevant API routes.
   // /api/health and /api/auth are not matched and remain public.
   matcher: ['/', '/patients/:path*', '/api/patients/:path*', '/api/sessions/:path*'],
 };
