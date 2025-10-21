@@ -55,19 +55,19 @@ const TableStyles = () => (
   `}</style>
 );
 
-interface ExerciseDetailPageProps {
+interface RehabExerciseDetailPageProps {
   params: {
     id: string; // patientId
     sessionId: string;
-    sessionExerciseId: string;
+    rehabSessionExerciseId: string;
   };
 }
 
-export default async function SessionExerciseDetailPage({ params }: ExerciseDetailPageProps) {
-  const { id: patientId, sessionId, sessionExerciseId } = params;
+export default async function RehabSessionExerciseDetailPage({ params }: RehabExerciseDetailPageProps) {
+  const { id: patientId, sessionId, rehabSessionExerciseId } = params;
 
-  const sessionExercise = await prisma.sessionExercise.findUnique({
-    where: { id: parseInt(sessionExerciseId) },
+  const sessionExercise = await prisma.rehabSessionExercise.findUnique({
+    where: { id: parseInt(rehabSessionExerciseId) },
     include: {
       session: { include: { patient: true } },
       exerciseType: true,

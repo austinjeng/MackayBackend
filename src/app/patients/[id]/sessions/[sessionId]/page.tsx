@@ -2,17 +2,17 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
-interface SessionDetailPageProps {
+interface RehabSessionDetailPageProps {
   params: {
     id: string; // patientId
     sessionId: string;
   };
 }
 
-export default async function SessionDetailPage({ params }: SessionDetailPageProps) {
+export default async function RehabSessionDetailPage({ params }: RehabSessionDetailPageProps) {
   const { id: patientId, sessionId } = params;
 
-  const session = await prisma.session.findUnique({
+  const rehabSession = await prisma.rehabSession.findUnique({
     where: {
       id: parseInt(sessionId), // The URL param is a string, but the ID in the DB is an Int
     },
@@ -30,17 +30,17 @@ export default async function SessionDetailPage({ params }: SessionDetailPagePro
   });
 
   // Security check: Ensure the session actually belongs to the patient from the URL
-  if (!session || session.patientId !== patientId) {
+  if (!rehabSession || rehabSession.patientId !== patientId) {
     notFound();
   }
 
   return (
     <div className="home">
       <header className="hero">
-        <span className="eyebrow">Patient: {session.patient.name}</span>
-        <h1>復健ID: {session.id}</h1>
+        <span className="eyebrow">Patient: {rehabSession.patient.name}</span>
+        <h1>復健ID: {rehabSession.id}</h1>
         <p>
-          建立時間: {new Date(session.createdAt).toLocaleString('zh-TW', {
+          建立時間: {new Date(rehabSession.createdAt).toLocaleString('zh-TW', {
             timeZone: 'Asia/Taipei',
             dateStyle: 'full',
             timeStyle: 'short',
@@ -51,16 +51,16 @@ export default async function SessionDetailPage({ params }: SessionDetailPagePro
       <section className="panel" aria-label="Session Exercises">
         <div className="panel-header">
           <h2>復健中的運動</h2>
-          <span>{session.sessionExercises.length} 運動 found</span>
+          <span>{rehabSession.sessionExercises.length} 運動 found</span>
         </div>
 
-        {session.sessionExercises.length === 0 ? (
+        {rehabSession.sessionExercises.length === 0 ? (
           <div className="empty-state">
             <h3>沒有找到復健</h3>
           </div>
         ) : (
           <ul className="project-list">
-            {session.sessionExercises.map((sessionExercise) => (
+            {rehabSession.sessionExercises.map((sessionExercise) => (
               <li key={sessionExercise.id} className="project-list-item">
                 <Link href={`/patients/${patientId}/sessions/${sessionId}/exercises/${sessionExercise.id}`} className="project-link" style={{ width: '100%' }}>
                   <div>

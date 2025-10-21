@@ -18,7 +18,7 @@ model Patient {
   createdAt DateTime @default(now()) @map("建立時間")
   updatedAt DateTime @updatedAt @map("上次更新時間")
 
-  sessions Session[]
+  sessions RehabSession[]
 
   @@map("病患") // table name
 }
@@ -31,40 +31,40 @@ model ExerciseType {
   createdAt DateTime @default(now()) @map("建立時間")
   updatedAt DateTime @updatedAt @map("上次更新時間")
 
-  sessionExercises SessionExercise[]
+  sessionExercises RehabSessionExercise[]
 
   @@map("運動類型")
 }
 
 // 運動會話
-model Session {
+model RehabSession {
   id        Int           @id @default(autoincrement()) @map("會話ID")
   patientId String        @map("病患ID")
   startedAt DateTime      @map("開始時間")
   endedAt   DateTime?     @map("結束時間")
-  status    SessionStatus @default(open) @map("狀態")
+  status    RehabSessionStatus @default(open) @map("狀態")
   createdAt DateTime      @default(now()) @map("建立時間")
   updatedAt DateTime      @updatedAt @map("上次更新時間")
 
   patient          Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  sessionExercises SessionExercise[]
+  sessionExercises RehabSessionExercise[]
 
   @@index([patientId, startedAt(sort: Desc)])
   @@map("運動會話")
 }
 
 // 會話運動
-model SessionExercise {
+model RehabSessionExercise {
   id             Int                   @id @default(autoincrement()) @map("會話運動ID")
   sessionId      Int                   @map("會話ID")
   exerciseTypeId Int                   @map("運動類型ID")
-  status         SessionExerciseStatus @default(open) @map("狀態")
+  status         RehabSessionExerciseStatus @default(open) @map("狀態")
   startedAt      DateTime?             @map("開始時間")
   endedAt        DateTime?             @map("結束時間")
   createdAt      DateTime              @default(now()) @map("建立時間")
   updatedAt      DateTime              @updatedAt @map("上次更新時間")
 
-  session      Session         @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  session      RehabSession         @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   exerciseType ExerciseType    @relation(fields: [exerciseTypeId], references: [id], onDelete: Restrict)
   attempts     ExerciseAttempt[]
 
@@ -72,13 +72,13 @@ model SessionExercise {
   @@map("會話運動")
 }
 
-enum SessionStatus {
+enum RehabSessionStatus {
   open    @map("開啟")
   closed  @map("關閉")
   aborted @map("中止")
 }
 
-enum SessionExerciseStatus {
+enum RehabSessionExerciseStatus {
   open    @map("開啟")
   closed  @map("關閉")
   aborted @map("中止")
@@ -101,9 +101,68 @@ model ExerciseAttempt {
   createdAt         DateTime       @default(now()) @map("建立時間")
   updatedAt         DateTime       @updatedAt @map("上次更新時間")
 
-  sessionExercise SessionExercise @relation(fields: [sessionExerciseId], references: [id], onDelete: Cascade)
+  sessionExercise RehabSessionExercise @relation(fields: [sessionExerciseId], references: [id], onDelete: Cascade)
 
   @@index([sessionExerciseId, startedAt(sort: Desc)])
   @@index([outcome])
   @@map("運動紀錄")
+}
+
+
+// --- Auth ---
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  admin         Admin?
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Admin {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String    @unique
 }

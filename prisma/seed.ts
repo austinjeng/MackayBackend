@@ -1,4 +1,5 @@
-import { PrismaClient, AttemptOutcome } from '@prisma/client';
+import { PrismaClient, AttemptOutcome, RehabSessionExerciseStatus } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -13,7 +14,7 @@ async function main() {
 
   // 1. Clean up existing data and reset all sequences
   console.log('Truncating tables and resetting sequences...');
-  await prisma.$executeRawUnsafe('TRUNCATE TABLE "運動紀錄", "會話運動", "運動會話", "病患", "運動類型" RESTART IDENTITY;');
+  await prisma.$executeRawUnsafe('TRUNCATE TABLE "User", "Account", "Session", "VerificationToken", "Admin", "運動紀錄", "會話運動", "運動會話", "病患", "運動類型" RESTART IDENTITY;');
 
   // 2. Create Exercise Types
   const alternatingKnees = await prisma.exerciseType.create({
@@ -75,7 +76,7 @@ async function main() {
   }
 
   // 4. Create a Session
-  const session = await prisma.session.create({
+  const rehabSession = await prisma.rehabSession.create({
     data: {
       patientId: patient.id,
       startedAt: timeNow(),
@@ -83,15 +84,15 @@ async function main() {
     },
   });
 
-  console.log(`Created session ${session.id} for patient ${patient.name}.`);
+  console.log(`Created session ${rehabSession.id} for patient ${patient.name}.`);
 
   // 5. Create SessionExercises
-  const sessionExercises = await Promise.all([
-    prisma.sessionExercise.create({ data: { sessionId: session.id, exerciseTypeId: alternatingKnees.id } }),
-    prisma.sessionExercise.create({ data: { sessionId: session.id, exerciseTypeId: heelToToe.id } }),
-    prisma.sessionExercise.create({ data: { sessionId: session.id, exerciseTypeId: sideSteps.id } }),
-    prisma.sessionExercise.create({ data: { sessionId: session.id, exerciseTypeId: squat.id } }),
-    prisma.sessionExercise.create({ data: { sessionId: session.id, exerciseTypeId: tiptoeStand.id } }),
+  const rehabSessionExercises = await Promise.all([
+    prisma.rehabSessionExercise.create({ data: { sessionId: rehabSession.id, exerciseTypeId: alternatingKnees.id } }),
+    prisma.rehabSessionExercise.create({ data: { sessionId: rehabSession.id, exerciseTypeId: heelToToe.id } }),
+    prisma.rehabSessionExercise.create({ data: { sessionId: rehabSession.id, exerciseTypeId: sideSteps.id } }),
+    prisma.rehabSessionExercise.create({ data: { sessionId: rehabSession.id, exerciseTypeId: squat.id } }),
+    prisma.rehabSessionExercise.create({ data: { sessionId: rehabSession.id, exerciseTypeId: tiptoeStand.id } }),
   ]);
 
   console.log('Created session exercises.');
@@ -101,26 +102,26 @@ async function main() {
   // Attempts for Alternating Knees
   await prisma.exerciseAttempt.createMany({
     data: [
-      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg: random(70, 110) } },
-      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
-      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(55, 69) } },
-      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
-      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(55, 69) } },
-      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
-      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(55, 69) } },
-      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
-      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
-      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
-      { sessionExerciseId: sessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(55, 69) } },
+      { sessionExerciseId: rehabSessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg: random(70, 110) } },
+      { sessionExerciseId: rehabSessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
+      { sessionExerciseId: rehabSessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(55, 69) } },
+      { sessionExerciseId: rehabSessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
+      { sessionExerciseId: rehabSessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(55, 69) } },
+      { sessionExerciseId: rehabSessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
+      { sessionExerciseId: rehabSessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(55, 69) } },
+      { sessionExerciseId: rehabSessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
+      { sessionExerciseId: rehabSessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
+      { sessionExerciseId: rehabSessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg:random(70, 110)  } },
+      { sessionExerciseId: rehabSessionExercises[0].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(55, 69) } },
     ],
   });
 
   // Attempts for Heel-to-Toe Walk (example with steps)
   await prisma.exerciseAttempt.createMany({
     data: [
-      { sessionExerciseId: sessionExercises[1].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { steps: 10} },
-      { sessionExerciseId: sessionExercises[1].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { steps: 10} },
-      { sessionExerciseId: sessionExercises[1].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { steps: 10} },
+      { sessionExerciseId: rehabSessionExercises[1].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { steps: 10} },
+      { sessionExerciseId: rehabSessionExercises[1].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { steps: 10} },
+      { sessionExerciseId: rehabSessionExercises[1].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { steps: 10} },
 
     ],
   });
@@ -128,10 +129,10 @@ async function main() {
   // Attempts for Side Steps
   await prisma.exerciseAttempt.createMany({
     data: [
-      { sessionExerciseId: sessionExercises[2].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg: random(108, 132) } },
-      { sessionExerciseId: sessionExercises[2].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(102, 108) } },
-      { sessionExerciseId: sessionExercises[2].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg: random(108, 132)} },
-      { sessionExerciseId: sessionExercises[2].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(132, 138) } },
+      { sessionExerciseId: rehabSessionExercises[2].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg: random(108, 132) } },
+      { sessionExerciseId: rehabSessionExercises[2].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(102, 108) } },
+      { sessionExerciseId: rehabSessionExercises[2].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg: random(108, 132)} },
+      { sessionExerciseId: rehabSessionExercises[2].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg: random(132, 138) } },
 
 
     ],
@@ -140,9 +141,9 @@ async function main() {
   // Attempts for Squat
   await prisma.exerciseAttempt.createMany({
     data: [
-      { sessionExerciseId: sessionExercises[3].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg: random(108, 135) } },
-      { sessionExerciseId: sessionExercises[3].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg:random(135, 162) } },
-      { sessionExerciseId: sessionExercises[3].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg: random(108, 135) } },
+      { sessionExerciseId: rehabSessionExercises[3].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg: random(108, 135) } },
+      { sessionExerciseId: rehabSessionExercises[3].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'fail', data: { angleDeg:random(135, 162) } },
+      { sessionExerciseId: rehabSessionExercises[3].id, startedAt: timeNow(), endedAt: timeNow(), outcome: 'success', data: { angleDeg: random(108, 135) } },
     ],
   });
 
@@ -150,14 +151,14 @@ async function main() {
   await prisma.exerciseAttempt.createMany({
     data: [
       {
-        sessionExerciseId: sessionExercises[4].id,
+        sessionExerciseId: rehabSessionExercises[4].id,
         startedAt: timeNow(),
         endedAt: timeNow(),
         outcome: 'success',
         data: { angleDeg: random(20, 45), holdSeconds: random(3,6) },
       },
       {
-        sessionExerciseId: sessionExercises[4].id,
+        sessionExerciseId: rehabSessionExercises[4].id,
         startedAt: timeNow(),
         endedAt: timeNow(),
         outcome: 'fail',
@@ -167,6 +168,27 @@ async function main() {
   });
 
   console.log('Created exercise attempts.');
+
+  // 7. Create an Admin User
+  console.log('Creating admin user...');
+  const salt = await bcrypt.genSalt(10);
+  const passwordHash = await bcrypt.hash('password', salt);
+
+  const user = await prisma.user.create({
+    data: {
+      name: 'Admin',
+      email: 'admin@example.com',
+      admin: {
+        create: {
+          username: 'admin',
+          passwordHash,
+        },
+      },
+    },
+  });
+
+  console.log(`Created admin user: ${user.name}`);
+
 
   console.log('Seeding finished.');
 }

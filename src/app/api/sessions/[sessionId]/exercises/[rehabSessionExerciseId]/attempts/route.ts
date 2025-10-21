@@ -6,7 +6,7 @@ import { authenticateApiRequest } from '@/lib/apiAuth';
 interface AttemptsApiRouteProps {
   params: {
     sessionId: string;
-    sessionExerciseId: string;
+    rehabSessionExerciseId: string;
   };
 }
 
@@ -19,7 +19,7 @@ interface AttemptPayload {
 }
 
 export async function POST(request: Request, { params }: AttemptsApiRouteProps) {
-  const { sessionExerciseId } = params;
+  const { rehabSessionExerciseId } = params;
   const authResult = await authenticateApiRequest(request);
 
   if ('response' in authResult) {
@@ -30,12 +30,12 @@ export async function POST(request: Request, { params }: AttemptsApiRouteProps) 
 
   // Authorization Check: Ensure the session exercise belongs to the authenticated patient
   try {
-    const sessionExercise = await prisma.sessionExercise.findUnique({
-      where: { id: parseInt(sessionExerciseId) },
-      select: { session: { select: { patientId: true } } },
+    const rehabSessionExercise = await prisma.rehabSessionExercise.findUnique({
+      where: { id: parseInt(rehabSessionExerciseId) },
+      select: { rehabSession: { select: { patientId: true } } },
     });
 
-    if (!sessionExercise || sessionExercise.session.patientId !== patientId) {
+    if (!rehabSessionExercise || rehabSessionExercise.rehabSession.patientId !== patientId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
   } catch (e) {
@@ -61,7 +61,7 @@ export async function POST(request: Request, { params }: AttemptsApiRouteProps) 
 
     // --- Data Transformation ---
     const dataToCreate = attempts.map(attempt => ({
-      sessionExerciseId: parseInt(sessionExerciseId),
+      sessionExerciseId: parseInt(rehabSessionExerciseId),
       startedAt: new Date(attempt.startedAt),
       endedAt: attempt.endedAt ? new Date(attempt.endedAt) : null,
       outcome: attempt.outcome,
@@ -88,7 +88,7 @@ export async function POST(request: Request, { params }: AttemptsApiRouteProps) 
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2003') { // Foreign key constraint failed
         return NextResponse.json(
-          { error: `Invalid sessionExerciseId: The specified session exercise does not exist.` },
+          { error: `Invalid rehabSessionExerciseId: The specified rehab session exercise does not exist.` },
           { status: 400 }
         );
       }
