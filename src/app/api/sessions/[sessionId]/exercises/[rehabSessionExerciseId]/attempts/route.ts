@@ -32,10 +32,10 @@ export async function POST(request: Request, { params }: AttemptsApiRouteProps) 
   try {
     const rehabSessionExercise = await prisma.rehabSessionExercise.findUnique({
       where: { id: parseInt(rehabSessionExerciseId) },
-      select: { rehabSession: { select: { patientId: true } } },
+      select: { session: { select: { patientId: true } } },
     });
 
-    if (!rehabSessionExercise || rehabSessionExercise.rehabSession.patientId !== patientId) {
+    if (!rehabSessionExercise || rehabSessionExercise.session.patientId !== patientId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
   } catch (e) {

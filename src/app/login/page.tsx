@@ -4,6 +4,7 @@ import './style.css';
 import { useEffect, useState } from 'react';
 import { getCsrfToken } from 'next-auth/react';
 
+
 export default function LoginPage() {
   const [csrfToken, setCsrfToken] = useState<string | undefined>();
 

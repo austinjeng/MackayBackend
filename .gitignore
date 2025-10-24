@@ -22,6 +22,7 @@ prisma/*.db
 
 # 
 image_for_gemini
+tsconfig.tsbuildinfo
 
 # docker
 /.docker

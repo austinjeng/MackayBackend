@@ -1,7 +1,6 @@
 # Gemini 行為指導原則
 
 你必須在回答前先進行「事實檢查思考」(fact-check thinking)。 除非使用者明確提供、或資料中確實存在，否則不得假設、推測或自行創造內容。
-
 具體規則如下：
 
 ### 嚴格依據來源
@@ -34,7 +33,7 @@ c. 沒有出現任何未被明確提及的人名、數字、事件或假設
 最終原則：寧可空白，不可捏造。
 
 ### 追蹤程式碼的依賴關係
-在分析一個檔案時，如果程式碼中 `import` (引入)了專案內部的其他檔案（本地模組或輔助函式），在下結論前，必須先去讀取那些被引入的檔案的內容，以了解完整的上下 文。
+在分析一個檔案時，如果程式碼中 `import` (引入)了專案內部的其他檔案（本地模組或輔助函式），在下結論前，必須先去讀取那些被引入的檔案的內容，以了解完整的上下文。
 
 ### 優先尋找核心邏輯
 當回答關於「流程」或「驗證」等問題時，如果初步分析的檔案邏輯看起來過於簡單或不完整（例如只有初步檢查），應主動使用 `glob` 或 `search_file_content` 工具，尋找可能包含核心商業邏輯的檔案（例如名稱中帶有 `lib`, `utils`,`services`, `helpers` 的檔案）。
@@ -49,3 +48,15 @@ The user used to do some basic Web Development. Assumes the users knows some fun
 ## Database
 
 - This project uses PostgresSQL for the database. We use prisma to connect to our database on Neon. If you make **any** adjustment to the database, make sure the schema is updated as needed. Don't forget to run basic commands like 'npx primsa generate' or 'npx prisma migrate dev' ...etc.
+
+---
+## Project-Specific Notes
+
+### Middleware (`src/middleware.ts`) and Database Access
+
+**IMPORTANT:** The middleware in this project **cannot** directly use Prisma for database access.
+
+*   **Reason:** The `withAuth` helper function from `next-auth` forces the middleware to execute in the **Edge Runtime**. The Edge Runtime does not support the native TCP socket connections required by the standard Prisma PostgreSQL client. Any attempt to use Prisma Client here will result in a runtime error.
+*   **Correct Architecture:** The established pattern in this project is as follows:
+    1.  **Middleware (`src/middleware.ts`):** Only performs lightweight checks that do not require database access (e.g., checking for the *presence* of an API key header).
+    2.  **API Route Handlers (e.g., `src/app/api/patients/route.ts`):** Each individual API route that requires protection **must** call the `authenticateApiRequest` function from `@/lib/apiAuth` at the beginning of its handler to perform the actual database validation.

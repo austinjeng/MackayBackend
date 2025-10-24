@@ -1,12 +1,25 @@
 import { withAuth } from 'next-auth/middleware';
 import { NextRequest, NextResponse } from 'next/server';
+import { ratelimit } from '@/lib/ratelimit';
 
 export default withAuth(
-  function middleware(req: NextRequest) {
+  async function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
 
+    // Rate Limiting Logic for API routes (login attempts moved to authorize function)
+    if (pathname.startsWith('/api/')) {
+      // For API routes, use API key as identifier if available, otherwise IP
+      const apiKey = req.headers.get('x-api-key') ?? req.headers.get('X-API-Key');
+      const identifier = apiKey || req.ip || '127.0.0.1'; // Fallback for local development
 
-    // 針對 API 路由的 API Key 檢查
+      const { success } = await ratelimit.limit(identifier);
+
+      if (!success) {
+        return new NextResponse('Too many requests. Please try again later.', { status: 429 });
+      }
+    }
+
+    // 針對 API 路由的 API Key 檢查 (僅檢查存在性，實際驗證在 API 路由內部)
     if (pathname.startsWith('/api/') && !pathname.startsWith('/api/auth')) {
       const apiKey = req.headers.get('x-api-key') ?? req.headers.get('X-API-Key');
       if (!apiKey) {
@@ -30,7 +43,7 @@ export default withAuth(
         // They do not require a web session token.
         if (pathname.startsWith('/api/')) {
           // Let the main middleware function handle API key logic.
-          // We return true here to indicate that `withAuth` should not block the request itself.
+          // We return true here to indicate that `withAuth` should not block the request itself. 
           return true;
         }
 
@@ -47,5 +60,5 @@ export default withAuth(
 //沒被列在 `matcher` 裡的，就是公開的
 export const config = {
   // /api/health and /api/auth are not matched and remain public.
-  matcher: ['/', '/patients/:path*', '/api/patients/:path*', '/api/sessions/:path*'],
+  matcher: ['/', '/patients/:path*', '/api/patients/:path*', '/api/sessions/:path*', '/login'],
 };
