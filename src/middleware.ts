@@ -20,7 +20,11 @@ export default withAuth(
     }
 
     // 針對 API 路由的 API Key 檢查 (僅檢查存在性，實際驗證在 API 路由內部)
-    if (pathname.startsWith('/api/') && !pathname.startsWith('/api/auth')) {
+    if (
+      pathname.startsWith('/api/') &&
+      !pathname.startsWith('/api/auth') &&
+      !pathname.startsWith('/api/admin')
+    ) {
       const apiKey = req.headers.get('x-api-key') ?? req.headers.get('X-API-Key');
       if (!apiKey) {
         return new NextResponse(
@@ -60,5 +64,5 @@ export default withAuth(
 //沒被列在 `matcher` 裡的，就是公開的
 export const config = {
   // /api/health and /api/auth are not matched and remain public.
-  matcher: ['/', '/patients/:path*', '/api/patients/:path*', '/api/sessions/:path*', '/login'],
+  matcher: ['/', '/patients/:path*', '/api/patients/:path*', '/api/sessions/:path*', '/api/admin/:path*', '/login'],
 };

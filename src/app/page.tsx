@@ -1,13 +1,40 @@
-import { Patient } from '@prisma/client';
-import prisma from "@/lib/prisma";
 import Link from 'next/link';
+import { cookies, headers } from 'next/headers';
+
+type PatientSummary = {
+  id: string;
+  name: string;
+  dob: string | null;
+};
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-async function loadPatientData(): Promise<Patient[]> {
+async function loadPatientData(): Promise<PatientSummary[]> {
   try {
-    const patients = await prisma.patient.findMany();
+    const headerList = headers();
+    const protocol = headerList.get('x-forwarded-proto') ?? 'http';
+    const host = headerList.get('x-forwarded-host') ?? headerList.get('host');
+
+    if (!host) {
+      console.warn('Missing host header when loading patient data');
+      return [];
+    }
+
+    const cookieStore = cookies();
+    const response = await fetch(`${protocol}://${host}/api/admin/patients`, {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      console.error('Failed to fetch patients via admin API:', response.statusText);
+      return [];
+    }
+
+    const patients = (await response.json()) as PatientSummary[];
     return patients;
   } catch (error) {
     console.error('Error fetching patients:', error);
@@ -15,10 +42,10 @@ async function loadPatientData(): Promise<Patient[]> {
   }
 }
 
-function calculateAge(dob: Date | null): number | null {
+function calculateAge(dob: string | Date | null): number | null {
   if (!dob) return null;
 
-  const birthDate = new Date(dob);
+  const birthDate = dob instanceof Date ? dob : new Date(dob);
   if (Number.isNaN(birthDate.getTime())) return null;
 
   const today = new Date();
