@@ -58,13 +58,33 @@ async function main() {
   // 3. Create a Patient
   const patient = await prisma.patient.create({
     data: {
-      id: 'clxsm1o2w000008l4c1g2h3j4', // Example CUID
+      id: '454523451325345', 
       name: '王大明',
       dob: new Date('1950-01-15T00:00:00.000Z'),
     },
   });
 
   console.log(`Created patient: ${patient.name}`);
+
+  const patient2 = await prisma.patient.create({
+    data: {
+      id: '1241352513512414', 
+      name: '李相赫',
+      dob: new Date('1994-01-15T00:00:00.000Z'),
+    },
+  });
+
+  console.log(`Created patient: ${patient2.name}`);
+
+  const patient3 = await prisma.patient.create({
+    data: {
+      id: '124234523452345245', 
+      name: '非洲奇異果',
+      dob: new Date('2000-01-15T00:00:00.000Z'),
+    },
+  });
+
+  console.log(`Created patient: ${patient3.name}`);
 
   // Log the API key for the test patient
   const createdPatient = await prisma.patient.findUnique({ where: { id: patient.id } });

@@ -1,15 +1,17 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Fragment } from "react";
 
 export default async function PatientSessionsListPage({ params }: { params: { id: string } }) {
   const patient = await prisma.patient.findUnique({
     where: { id: params.id },
     include: {
       sessions: {
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy: [
+          { sessionDate: "desc" },
+          { startedAt: "desc" },
+        ],
       },
     },
   });
@@ -17,6 +19,38 @@ export default async function PatientSessionsListPage({ params }: { params: { id
   if (!patient) {
     notFound();
   }
+
+  const sessionsGroupedByDate = patient.sessions.reduce<Record<string, typeof patient.sessions[number][]>>(
+    (acc, session) => {
+      const key = session.sessionDate?.toISOString() ?? session.startedAt.toISOString();
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(session);
+      return acc;
+    },
+    {},
+  );
+
+  const sessionDateOrder = Object.keys(sessionsGroupedByDate).sort((a, b) =>
+    new Date(b).getTime() - new Date(a).getTime(),
+  );
+
+  const formatDateLabel = (dateIso: string) =>
+    new Date(dateIso).toLocaleDateString("zh-TW", {
+      timeZone: "Asia/Taipei",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+
+  const formatTimeLabel = (date: Date) =>
+    new Date(date).toLocaleTimeString("zh-TW", {
+      timeZone: "Asia/Taipei",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
 
   return (
     <div className="home">
@@ -38,28 +72,31 @@ export default async function PatientSessionsListPage({ params }: { params: { id
             <p>這個病患還沒有進行任何復健</p>
           </div>
         ) : (
-          <ul className="project-list">
-            {patient.sessions.map((rehabSession) => (
-              <li key={rehabSession.id} className="project-list-item">
-                <Link href={`/patients/${patient.id}/sessions/${rehabSession.id}`} className="project-link" style={{ width: '100%' }}>
-                  <div>
-                    <h3>復健ID: {rehabSession.id}</h3>
-                    <span>
-                      開始時間: {new Date(rehabSession.startedAt).toLocaleString('zh-TW', {
-                        timeZone: 'Asia/Taipei',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true,
-                      })}
-                    </span>
-                  </div>
-                </Link>
-              </li>
+          <div className="project-list">
+            {sessionDateOrder.map((dateIso) => (
+              <Fragment key={dateIso}>
+                <h3 style={{ marginTop: "1.5rem" }}>{formatDateLabel(dateIso)}</h3>
+                <ul className="project-list" style={{ marginTop: "0.5rem" }}>
+                  {sessionsGroupedByDate[dateIso].map((rehabSession) => (
+                    <li key={rehabSession.id} className="project-list-item">
+                      <Link
+                        href={`/patients/${patient.id}/sessions/${rehabSession.id}`}
+                        className="project-link"
+                        style={{ width: "100%" }}
+                      >
+                        <div>
+                          <h4 style={{ marginBottom: "0.25rem" }}>復健ID: {rehabSession.id}</h4>
+                          <span>
+                            開始時間: {formatTimeLabel(rehabSession.startedAt)}
+                          </span>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </Fragment>
             ))}
-          </ul>
+          </div>
         )}
       </section>
     </div>
