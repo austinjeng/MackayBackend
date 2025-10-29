@@ -64,7 +64,7 @@ test('patients route returns 404 when no record exists for patientId', async () 
 });
 
 test('admin patients route enforces admin role', async () => {
-  const { createAdminPatientsHandler } = await import('@/app/api/admin/patients/route');
+  const { createAdminPatientsHandler } = await import('@/app/api/admin/patients/handler');
   const adminHandler = createAdminPatientsHandler({
     getSession: (async () =>
       ({
