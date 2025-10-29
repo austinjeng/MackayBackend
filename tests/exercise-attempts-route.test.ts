@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { AttemptOutcome, Prisma } from '@prisma/client';
-import type { ExerciseAttemptsRouteDeps } from '@/app/api/patients/exercise-attempts/route';
+import type { ExerciseAttemptsRouteDeps } from '@/app/api/patients/exercise-attempts/handler';
 
 test('exercise attempts route creates attempts and ensures session hierarchy', async () => {
   const {
     createExerciseAttemptsHandler,
-  } = await import('@/app/api/patients/exercise-attempts/route');
+  } = await import('@/app/api/patients/exercise-attempts/handler');
 
   const attemptsPayload = [
     {
@@ -112,7 +112,7 @@ test('exercise attempts route creates attempts and ensures session hierarchy', a
 test('exercise attempts route returns 400 when exerciseCode is invalid', async () => {
   const {
     createExerciseAttemptsHandler,
-  } = await import('@/app/api/patients/exercise-attempts/route');
+  } = await import('@/app/api/patients/exercise-attempts/handler');
 
   const handler = createExerciseAttemptsHandler({
     authenticateRequest: async () => ({ patientId: 'patient-1' }),

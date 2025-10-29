@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import type prisma from '@/lib/prisma';
 
 test('patients route returns the authenticated patient record', async () => {
-  const { createPatientsHandler } = await import('@/app/api/patients/route');
+  const { createPatientsHandler } = await import('@/app/api/patients/handler');
   const handler = createPatientsHandler({
     authenticateRequest: async () => ({ patientId: 'patient-1' }),
     prismaClient: {
@@ -27,7 +27,7 @@ test('patients route returns the authenticated patient record', async () => {
 });
 
 test('patients route forwards authentication failures', async () => {
-  const { createPatientsHandler } = await import('@/app/api/patients/route');
+  const { createPatientsHandler } = await import('@/app/api/patients/handler');
   const authFailureResponse = NextResponse.json(
     { error: 'Unauthorized' },
     { status: 401 },
@@ -49,7 +49,7 @@ test('patients route forwards authentication failures', async () => {
 });
 
 test('patients route returns 404 when no record exists for patientId', async () => {
-  const { createPatientsHandler } = await import('@/app/api/patients/route');
+  const { createPatientsHandler } = await import('@/app/api/patients/handler');
   const handler = createPatientsHandler({
     authenticateRequest: async () => ({ patientId: 'missing-patient' }),
     prismaClient: {
