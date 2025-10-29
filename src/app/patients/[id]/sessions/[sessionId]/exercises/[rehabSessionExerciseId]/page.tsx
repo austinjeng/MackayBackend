@@ -170,7 +170,15 @@ export default async function RehabSessionExerciseDetailPage({ params }: RehabEx
                     <tr key={attempt.id}>
                       <td>{attempt.id}</td>
                       <td className={`outcome-${attempt.outcome}`}>{outcomeLocalizationMap[attempt.outcome] || attempt.outcome}</td>
-                      <td>{new Date(attempt.startedAt).toLocaleTimeString('zh-TW')}</td>
+                      <td>
+                        {new Date(attempt.startedAt).toLocaleTimeString('zh-TW', {
+                          timeZone: 'Asia/Taipei',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                          second: '2-digit',
+                          hour12: true,
+                        })}
+                      </td>
                       {/* Dynamic cells for JSON data */}
                       {dynamicHeaders.map(header => {
                         const value = (attempt.data as any)?.[header];
