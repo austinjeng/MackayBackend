@@ -8,6 +8,7 @@ const random = (min: number, max: number) => Math.random() * (max - min) + min;
 
 // Helper function to create a timestamp
 const timeNow = () => new Date();
+const startOfUtcDay = (date: Date) => new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
 
 async function main() {
   console.log('Seeding database...');
@@ -76,10 +77,12 @@ async function main() {
   }
 
   // 4. Create a Session
+  const sessionStartedAt = timeNow();
   const rehabSession = await prisma.rehabSession.create({
     data: {
       patientId: patient.id,
-      startedAt: timeNow(),
+      sessionDate: startOfUtcDay(sessionStartedAt),
+      startedAt: sessionStartedAt,
       status: 'open',
     },
   });

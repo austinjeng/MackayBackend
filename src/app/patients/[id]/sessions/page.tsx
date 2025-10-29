@@ -45,7 +45,7 @@ export default async function PatientSessionsListPage({ params }: { params: { id
                   <div>
                     <h3>復健ID: {rehabSession.id}</h3>
                     <span>
-                      建立時間: {new Date(rehabSession.createdAt).toLocaleString('zh-TW', {
+                      開始時間: {new Date(rehabSession.startedAt).toLocaleString('zh-TW', {
                         timeZone: 'Asia/Taipei',
                         year: 'numeric',
                         month: 'long',
