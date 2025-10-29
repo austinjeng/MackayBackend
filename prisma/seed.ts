@@ -1,5 +1,5 @@
 import { PrismaClient, AttemptOutcome, RehabSessionExerciseStatus } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -194,8 +194,8 @@ async function main() {
 
   // 7. Create an Admin User
   console.log('Creating admin user...');
-  const salt = await bcrypt.genSalt(10);
-  const passwordHash = await bcrypt.hash('password', salt);
+  const salt = bcrypt.genSaltSync(10);
+  const passwordHash = bcrypt.hashSync('password', salt);
 
   const user = await prisma.user.create({
     data: {
