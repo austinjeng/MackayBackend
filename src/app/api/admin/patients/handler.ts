@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession, type NextAuthOptions } from 'next-auth';
 import prisma from '@/lib/prisma';
 
 export type AdminPatientsRouteDeps = {
   getSession: typeof getServerSession;
   prismaClient: typeof prisma;
-  getAuthOptions: () => Promise<unknown> | unknown;
+  getAuthOptions: () => Promise<NextAuthOptions> | NextAuthOptions;
 };
 
 const defaultDeps: AdminPatientsRouteDeps = {
