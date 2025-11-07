@@ -82,7 +82,8 @@ async function main() {
 
       const selectedExercises = exerciseTypes.slice(0, 3 + (offset % 2));
 
-      for (const [index, exerciseType] of selectedExercises.entries()) {
+      for (let index = 0; index < selectedExercises.length; index += 1) {
+        const exerciseType = selectedExercises[index];
         const exerciseStart = addMinutes(sessionStart, index * 20);
 
         const sessionExercise = await prisma.rehabSessionExercise.create({
