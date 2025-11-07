@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Fragment } from "react";
+import BackHomeButton from "@/components/BackHomeButton";
 
 export default async function PatientSessionsListPage({ params }: { params: { id: string } }) {
   const patient = await prisma.patient.findUnique({
@@ -58,6 +59,7 @@ export default async function PatientSessionsListPage({ params }: { params: { id
         <span className="eyebrow">病患</span>
         <h1>{patient.name}</h1>
         <p>復健歷史</p>
+        <BackHomeButton />
       </header>
 
       <section className="panel" aria-label="Sessions">

@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import BackHomeButton from "@/components/BackHomeButton";
 
 interface RehabSessionDetailPageProps {
   params: {
@@ -51,6 +52,7 @@ export default async function RehabSessionDetailPage({ params }: RehabSessionDet
             dateStyle: 'full',
           })}
         </p>
+        <BackHomeButton />
       </header>
 
       <section className="panel" aria-label="Session Exercises">

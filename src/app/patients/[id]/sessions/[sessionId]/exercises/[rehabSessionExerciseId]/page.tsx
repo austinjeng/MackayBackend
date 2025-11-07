@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import BackHomeButton from "@/components/BackHomeButton";
 
 // Helper component to add some basic styling for the table
 const TableStyles = () => (
@@ -124,6 +125,7 @@ export default async function RehabSessionExerciseDetailPage({ params }: RehabEx
         <span className="eyebrow">運動詳細資料</span>
         <h1>{exerciseType.name}</h1>
         <p>病患名稱: {sessionExercise.session.patient.name}</p>
+        <BackHomeButton />
       </header>
 
       <section className="panel" aria-label="Exercise Attempts">
