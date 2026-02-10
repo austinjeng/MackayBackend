@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import BackHomeButton from "@/components/BackHomeButton";
 
+export const dynamic = "force-dynamic";
+
 interface RehabSessionDetailPageProps {
   params: {
     id: string; // patientId

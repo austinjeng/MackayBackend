@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Fragment } from "react";
 import BackHomeButton from "@/components/BackHomeButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function PatientSessionsListPage({ params }: { params: { id: string } }) {
   const patient = await prisma.patient.findUnique({
     where: { id: params.id },

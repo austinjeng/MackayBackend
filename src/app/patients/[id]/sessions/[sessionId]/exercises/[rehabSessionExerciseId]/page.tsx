@@ -2,6 +2,8 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import BackHomeButton from "@/components/BackHomeButton";
 
+export const dynamic = "force-dynamic";
+
 // Helper component to add some basic styling for the table
 const TableStyles = () => (
   <style>{`
