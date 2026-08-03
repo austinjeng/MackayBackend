@@ -11,12 +11,13 @@
         "lint": "next lint",
         "test": "node --import tsx --test tests/**/*.test.ts",
         "prisma:generate": "prisma generate",
-        "prisma:deploy": "prisma migrate deploy",
-        "prisma:studio": "prisma studio",
-        "postinstall": "prisma generate",
-        "prisma:seed": "tsx prisma/seed.ts",
-        "prisma:seed1" : "tsx prisma/seed1.ts"
-    },
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:studio": "prisma studio",
+    "postinstall": "prisma generate",
+    "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:seed:prod": "tsx prisma/seed.prod.ts",
+    "prisma:seed1" : "tsx prisma/seed1.ts"
+  },
     "dependencies": {
         "@prisma/client": "^6.16.3",
         "@upstash/ratelimit": "^2.0.6",
